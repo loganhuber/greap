@@ -168,12 +168,12 @@ function extract.all_track_values()
 -- local project_path = reaper.GetProjectPath()
 --  reaper.ShowConsoleMsg(project_path)
   local track_count = reaper.CountTracks(0)
-  local data = ''
+  local data = {}
   for i = 0, track_count - 1 do
     local track = reaper.GetTrack(0, i)
     local name, track_info = pack_track_info(track)
-    data = data .. name .. ': ' .. dump(track_info) .. '\n'
-    
+    -- data = data .. name .. ': ' .. dump(track_info) .. '\n'
+    data[name] = track_info
   end
 
   return data
