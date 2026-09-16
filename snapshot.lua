@@ -33,7 +33,7 @@ function snapshot.build(name, data) -- joins name (ex: "V2") to snap data in one
 end
 
 
-function snapshot.save(json_data)
+function snapshot.save(json_data) -- saves snapshot in a json file within the reaper project directory
     local project_path = paths.project_path()
     
     local number = snapshot.next_number(project_path .. "/.greap")
@@ -44,6 +44,95 @@ function snapshot.save(json_data)
     reaper.ShowConsoleMsg(tostring(error_message))
     file:write(json_data)
     file:close()
+end
+
+function snapshot.read_all() -- returns a table of all snapshots currently saved in the reaper project directory
+    local snapshots = {}
+    local index = 0
+    local directory = paths.greap_path()
+    
+    while true do
+        local filename = reaper.EnumerateFiles(directory, index)
+        if not filename then
+            break
+        end
+    
+        if filename:match("%.json$") then
+            local filepath = directory .. '/' .. filename
+            local file, error_message = io.open(filepath, 'r')
+    
+            if not file then
+                return nil, error_message
+            end
+            local contents = file:read("*a")
+            file:close()
+    
+            local success, decoded = pcall(json.decode, contents)
+            if not success then
+                return nil, "Invalid JSON in " .. filename .. ": " .. decoded
+            end
+    
+            snapshots[filename] = decoded
+        end 
+    
+        index = index + 1
+    end
+    return snapshots
+end
+
+function snapshot.read(filepath) -- returns a table of a single snapshot by the filepath
+    local snapshot = {}
+    local file, error_message = io.open(filepath, 'r')
+
+    if not file then
+        return nil, error_message
+    end
+
+    local contents = file:read("*a")
+    file:close()
+
+    local success, decoded = pcall(json.decode, contents)
+    local filename = filepath:match("[^/\\]+$")
+    if not success then
+        return nil, "Invalid JSON in " .. filename .. ": " .. decoded
+    end
+
+    snapshot[filename] = decoded
+
+    return snapshot
+end
+
+function snapshot.filename(name) -- returns the filename.json of a snapshot by user given name
+    local index = 0
+    local directory = paths.greap_path()
+
+    while true do
+        local filename = reaper.EnumerateFiles(directory, index)
+        if not filename then
+            break
+        end
+
+        if filename:match("%.json$") then
+            local filepath = directory .. '/' .. filename
+            local decoded = snapshot.read(filepath)
+            if decoded[filename][name] then
+                return filename
+            end
+        end
+        index = index + 1
+    end
+end
+
+function snapshot.delete(name) -- takes user given name and removes the json file
+    local snapshots = snapshot.read_all()
+
+    for filename, snap in pairs(snapshots) do
+        if snap[name] then
+            -- delete here
+            reaper.ShowConsoleMsg("Deleted: " .. filename)
+            break
+        end
+    end
 end
 
 -- TODO:

@@ -6,7 +6,7 @@ package.path = script_dir .. "?.lua;" .. package.path
 local extract = require('extract')
 local snapshot = require('snapshot')
 -- local paths = require('paths')
--- local json = require('libraries.json')
+local json = require('libraries.json')
 
 
 -- creates hidden directory within reaper project dir to store json data
@@ -14,20 +14,26 @@ function init_greap()
     reaper.RecursiveCreateDirectory(project_path .. '/.greap', 0)
 end
 
-
-
-function main()
+local function take_snapshot()
     local track_values = extract.all_track_values()
-    -- take_snapshot(track_values)
     local name = 'V1'
     local json = snapshot.build(name, track_values)
     reaper.ShowConsoleMsg(json .. '\n\n')
-    -- reaper.ShowConsoleMsg("\nSuccessfully took snapshot")
-    -- reaper.ShowConsoleMsg(paths.project_path() .. '\n')
-    -- reaper.ShowConsoleMsg(track_values .. "\n")
     snapshot.save(json)
-    reaper.ShowConsoleMsg("Successfully saved snapshot")
-    
+    reaper.ShowConsoleMsg("\nSuccessfully saved snapshot")
+end
+
+
+function main()
+    -- take_snapshot()
+    -- local filename = snapshot.filename('V1')
+    -- reaper.ShowConsoleMsg(filename)
+
+    -- local snap = snapshot.read('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap/0001.json')
+    -- reaper.ShowConsoleMsg(json.encode(snap))
+
+    -- local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
+    -- reaper.ShowConsoleMsg(json.encode(snaps))
     
 end
 
