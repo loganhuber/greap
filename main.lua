@@ -43,25 +43,33 @@ function has_instance()
     end
 end
 
-local function take_snapshot()
+local function take_snapshot(snap_name)
     local track_values = extract.all_track_values()
-    local name = 'V1'
-    local json = snapshot.build(name, track_values)
-    reaper.ShowConsoleMsg(json .. '\n\n')
-    snapshot.save(json)
-    reaper.ShowConsoleMsg("\nSuccessfully saved snapshot")
+    local json, error_message = snapshot.build(snap_name, track_values)
+    -- reaper.ShowConsoleMsg(json .. '\n\n')
+    if not json then
+        reaper.ShowConsoleMsg(error_message .. '\n')
+        return
+    else
+        snapshot.save(json)
+        reaper.ShowConsoleMsg("\nSuccessfully saved snapshot: " .. snap_name .. '\n')
+    end
 end
 
 
 function main()
-    if has_instance() then
-        reaper.ShowConsoleMsg('true')
-    else
-        reaper.ShowConsoleMsg('false')
-    end
-    -- take_snapshot()
-    -- local filename = snapshot.filename('V1')
-    -- reaper.ShowConsoleMsg(filename)
+    -- if not has_instance() then
+    --     init_greap()
+    --     reaper.ShowConsoleMsg('greap instance created')
+    -- else
+    --     reaper.ShowConsoleMsg('there is already an instance')
+    -- end
+
+    -- take_snapshot('V2')
+    -- local filename = snapshot.filename('V2')
+    -- if filename then
+    --     reaper.ShowConsoleMsg('Filename: ' .. filename .. '\n')
+    -- end
 
     -- local snap = snapshot.read('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap/0001.json')
     -- reaper.ShowConsoleMsg(json.encode(snap))

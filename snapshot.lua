@@ -27,9 +27,18 @@ end
 
 
 function snapshot.build(name, data) -- joins name (ex: "V2") to snap data in one table, returns converted to json
-    local snap = { [name] = data }
-    local json_data = json.encode(snap)
-    return json_data
+    if not name or name == "" then
+        return nil, "Snapshot name is required"
+    end
+
+    local curr_snap = snapshot.filename(name)
+    if curr_snap then
+        return nil, "A snapshot named '" .. name .. "' already exists"
+    else
+        local snap = { [name] = data }
+        local json_data = json.encode(snap)
+        return json_data
+    end
 end
 
 
@@ -38,10 +47,13 @@ function snapshot.save(json_data) -- saves snapshot in a json file within the re
     
     local number = snapshot.next_number(project_path .. "/.greap")
     local output = string.format("%s/.greap/%04d.json", project_path, number)
-    reaper.ShowConsoleMsg(output)
+    -- reaper.ShowConsoleMsg(output)
     
     local file, error_message = io.open(output, "w")
-    reaper.ShowConsoleMsg(tostring(error_message))
+    if not file then
+        reaper.ShowConsoleMsg(tostring(error_message))
+        return
+    end
     file:write(json_data)
     file:close()
 end
@@ -109,18 +121,19 @@ function snapshot.filename(name) -- returns the filename.json of a snapshot by u
     while true do
         local filename = reaper.EnumerateFiles(directory, index)
         if not filename then
-            break
+            return nil
         end
 
         if filename:match("%.json$") then
             local filepath = directory .. '/' .. filename
             local decoded = snapshot.read(filepath)
-            if decoded[filename][name] then
+            if decoded and decoded[filename] and decoded[filename][name] ~= nil then
                 return filename
             end
         end
         index = index + 1
     end
+    return nil
 end
 
 function snapshot.delete(name) -- takes user given name and removes the json file
