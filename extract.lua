@@ -20,6 +20,8 @@ end
 local function pack_track_info(track) -- packs track info into one table per track
   local pack = {}
   local _, name = reaper.GetTrackName(track)
+
+  -- probably will not need all of these
   
   pack["b_mute"] = reaper.GetMediaTrackInfo_Value(track, "B_MUTE") --  muted
   

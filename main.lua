@@ -5,13 +5,42 @@ package.path = script_dir .. "?.lua;" .. package.path
 
 local extract = require('extract')
 local snapshot = require('snapshot')
--- local paths = require('paths')
+local paths = require('paths')
 local json = require('libraries.json')
 
 
 -- creates hidden directory within reaper project dir to store json data
 function init_greap()
+    local project_path = paths.project_path()
+    if project_path == '' then
+        return false
+    end
     reaper.RecursiveCreateDirectory(project_path .. '/.greap', 0)
+    return true
+end
+
+function has_instance()
+    local project_path = reaper.GetProjectPath()
+
+    if not project_path or project_path == "" then
+        return false -- project has not been saved yet
+    end
+
+    local index = 0
+
+    while true do
+        local directory = reaper.EnumerateSubdirectories(project_path, index)
+
+        if not directory then
+            return false
+        end
+
+        if directory == ".greap" then
+            return true
+        end
+
+        index = index + 1
+    end
 end
 
 local function take_snapshot()
@@ -25,6 +54,11 @@ end
 
 
 function main()
+    if has_instance() then
+        reaper.ShowConsoleMsg('true')
+    else
+        reaper.ShowConsoleMsg('false')
+    end
     -- take_snapshot()
     -- local filename = snapshot.filename('V1')
     -- reaper.ShowConsoleMsg(filename)

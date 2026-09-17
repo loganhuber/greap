@@ -135,6 +135,12 @@ function snapshot.delete(name) -- takes user given name and removes the json fil
     end
 end
 
+-- return values from two snaps that have changed
+-- function snapshot.diff(snap1, snap2) 
+--     ...
+--  return diff
+-- end
+
 -- TODO:
 
 -- return the data from an existing snapshot by the snap name
