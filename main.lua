@@ -11,6 +11,11 @@ local json = require('libraries.json')
 
 -- creates hidden directory within reaper project dir to store json data
 function init_greap()
+    if has_instance() then
+        reaper.ShowConsoleMsg("Already instance of greap")
+        return nil
+    end
+
     local project_path = paths.project_path()
     if project_path == '' then
         return false
@@ -65,8 +70,8 @@ function main()
     --     reaper.ShowConsoleMsg('there is already an instance')
     -- end
 
-    -- take_snapshot('V2')
-    -- local filename = snapshot.filename('V2')
+    -- take_snapshot('V69')
+    -- local filename = snapshot.filename('V69')
     -- if filename then
     --     reaper.ShowConsoleMsg('Filename: ' .. filename .. '\n')
     -- end
@@ -81,14 +86,6 @@ end
 
 
 main()
-
--- TODO
-
--- bool -> returns whether there is a /.greap dir within the project directory
--- function has_instance()
-    -- return true/false
--- end
-
 
 
 -- MAY BE USEFUL LATER

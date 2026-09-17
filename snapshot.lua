@@ -137,15 +137,22 @@ function snapshot.filename(name) -- returns the filename.json of a snapshot by u
 end
 
 function snapshot.delete(name) -- takes user given name and removes the json file
-    local snapshots = snapshot.read_all()
-
-    for filename, snap in pairs(snapshots) do
-        if snap[name] then
-            -- delete here
-            reaper.ShowConsoleMsg("Deleted: " .. filename)
-            break
-        end
+    if not name or name == "" then
+        return false, "Snapshot name is required"
     end
+
+    local filename = snapshot.filename(name)
+    if not filename then
+        return false, "No snapshot named '" .. name .. "' was found"
+    end
+
+    local filepath = paths.greap_path() .. filename
+    local success, error_message = os.remove(filepath)
+    if not success then
+        return false, error_message or "Unable to delete snapshot"
+    end
+
+    return true
 end
 
 -- return values from two snaps that have changed
