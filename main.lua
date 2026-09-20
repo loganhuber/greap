@@ -7,6 +7,7 @@ local extract = require('extract')
 local snapshot = require('snapshot')
 local paths = require('paths')
 local json = require('libraries.json')
+local gui = require('gui')
 
 
 -- creates hidden directory within reaper project dir to store json data
@@ -62,7 +63,11 @@ local function take_snapshot(snap_name)
 end
 
 
+-- /Users/logan/Library/Application Support/REAPER/Scripts/ReaTeam Scripts/Development/Scythe library v3/library/
+
 function main()
+
+    gui.start()
     -- if not has_instance() then
     --     init_greap()
     --     reaper.ShowConsoleMsg('greap instance created')
