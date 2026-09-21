@@ -67,7 +67,7 @@ end
 
 function main()
 
-    gui.start()
+    -- gui.start()
     -- if not has_instance() then
     --     init_greap()
     --     reaper.ShowConsoleMsg('greap instance created')
@@ -84,8 +84,9 @@ function main()
     -- local snap = snapshot.read('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap/0001.json')
     -- reaper.ShowConsoleMsg(json.encode(snap))
 
-    -- local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
+    local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
     -- reaper.ShowConsoleMsg(json.encode(snaps))
+    gui.start(snaps)
     
 end
 
