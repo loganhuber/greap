@@ -34,66 +34,77 @@ function snapshot.build(name, data) -- joins name (ex: "V2") to snap data in one
     local curr_snap = snapshot.filename(name)
     if curr_snap then
         return nil, "A snapshot named '" .. name .. "' already exists"
-    else
-        local snap = { [name] = data }
-        local json_data = json.encode(snap)
-        return json_data
     end
+
+    return {
+        name = name,
+        filename = nil,
+        data = data
+    }
 end
 
 
-function snapshot.save(json_data) -- saves snapshot in a json file within the reaper project directory
+function snapshot.save(snap_data) -- saves snapshot in a json file within the reaper project directory
     local project_path = paths.project_path()
-    
+
     local number = snapshot.next_number(project_path .. "/.greap")
-    local output = string.format("%s/.greap/%04d.json", project_path, number)
-    -- reaper.ShowConsoleMsg(output)
-    
+    local filename = string.format("%04d.json", number)
+    local output = string.format("%s/.greap/%s", project_path, filename)
+
+    snap_data.filename = filename
+
     local file, error_message = io.open(output, "w")
     if not file then
         reaper.ShowConsoleMsg(tostring(error_message))
-        return
+        return nil, error_message
     end
-    file:write(json_data)
+
+    file:write(json.encode(snap_data))
     file:close()
+
+    return output
 end
 
 function snapshot.read_all() -- returns a table of all snapshots currently saved in the reaper project directory
     local snapshots = {}
     local index = 0
     local directory = paths.greap_path()
-    
+
     while true do
         local filename = reaper.EnumerateFiles(directory, index)
         if not filename then
             break
         end
-    
+
         if filename:match("%.json$") then
             local filepath = directory .. '/' .. filename
             local file, error_message = io.open(filepath, 'r')
-    
+
             if not file then
                 return nil, error_message
             end
+
             local contents = file:read("*a")
             file:close()
-    
+
             local success, decoded = pcall(json.decode, contents)
             if not success then
                 return nil, "Invalid JSON in " .. filename .. ": " .. decoded
             end
-    
-            snapshots[filename] = decoded
-        end 
-    
+
+            if decoded and not decoded.filename then
+                decoded.filename = filename
+            end
+
+            table.insert(snapshots, decoded)
+        end
+
         index = index + 1
     end
     return snapshots
 end
 
 function snapshot.read(filepath) -- returns a table of a single snapshot by the filepath
-    local snapshot = {}
     local file, error_message = io.open(filepath, 'r')
 
     if not file then
@@ -109,9 +120,11 @@ function snapshot.read(filepath) -- returns a table of a single snapshot by the 
         return nil, "Invalid JSON in " .. filename .. ": " .. decoded
     end
 
-    snapshot[filename] = decoded
+    if decoded and not decoded.filename then
+        decoded.filename = filename
+    end
 
-    return snapshot
+    return decoded
 end
 
 function snapshot.filename(name) -- returns the filename.json of a snapshot by user given name
@@ -127,8 +140,8 @@ function snapshot.filename(name) -- returns the filename.json of a snapshot by u
         if filename:match("%.json$") then
             local filepath = directory .. '/' .. filename
             local decoded = snapshot.read(filepath)
-            if decoded and decoded[filename] and decoded[filename][name] ~= nil then
-                return filename
+            if decoded and decoded.name == name then
+                return decoded.filename or filename
             end
         end
         index = index + 1

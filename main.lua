@@ -51,13 +51,13 @@ end
 
 local function take_snapshot(snap_name)
     local track_values = extract.all_track_values()
-    local json, error_message = snapshot.build(snap_name, track_values)
+    local snap_data, error_message = snapshot.build(snap_name, track_values)
     -- reaper.ShowConsoleMsg(json .. '\n\n')
-    if not json then
+    if not snap_data then
         reaper.ShowConsoleMsg(error_message .. '\n')
         return
     else
-        snapshot.save(json)
+        snapshot.save(snap_data)
         reaper.ShowConsoleMsg("\nSuccessfully saved snapshot: " .. snap_name .. '\n')
     end
 end
@@ -66,8 +66,8 @@ end
 -- /Users/logan/Library/Application Support/REAPER/Scripts/ReaTeam Scripts/Development/Scythe library v3/library/
 
 function main()
-
     -- gui.start()
+
     -- if not has_instance() then
     --     init_greap()
     --     reaper.ShowConsoleMsg('greap instance created')
@@ -75,8 +75,8 @@ function main()
     --     reaper.ShowConsoleMsg('there is already an instance')
     -- end
 
-    -- take_snapshot('V69')
-    -- local filename = snapshot.filename('V69')
+    -- take_snapshot('V1')
+    -- local filename = snapshot.filename('V1')
     -- if filename then
     --     reaper.ShowConsoleMsg('Filename: ' .. filename .. '\n')
     -- end
@@ -84,9 +84,9 @@ function main()
     -- local snap = snapshot.read('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap/0001.json')
     -- reaper.ShowConsoleMsg(json.encode(snap))
 
-    local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
-    -- reaper.ShowConsoleMsg(json.encode(snaps))
-    gui.start(snaps)
+    -- local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
+    -- -- reaper.ShowConsoleMsg(json.encode(snaps))
+    -- gui.start(snaps)
     
 end
 
