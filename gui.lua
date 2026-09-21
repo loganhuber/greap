@@ -18,6 +18,45 @@ function gui.init_window()
     return window
 end
 
+function gui.swap_layers(layer1, layer2)
+    layer1:hide()
+    layer2:show()
+end
+
+function gui.snapshot_modal()
+    local layer = GUI.createLayer({
+        name = 'save snapshot layer'
+    })
+
+    local label = GUI.createElement({
+        type = 'label',
+        caption = 'Enter a name',
+        x = 500,
+        y = 2
+    })
+
+    local textbox = GUI.createElement({
+        name = 'snap_name',
+        type = 'Textbox',
+        x = 500,
+        y = 50
+    })
+
+    local save_button = GUI.createElement({
+        type = 'button',
+        caption = 'Save Snapshot',
+        x = 500,
+        y = 100
+    })
+
+    layer:addElements(save_button)
+    layer:addElements(label)
+    layer:addElements(textbox) 
+
+    return layer
+
+end
+
 function gui.no_greap() 
     local layer = GUI.createLayer({
         name = 'No Greap'
@@ -48,15 +87,17 @@ end
 
 
 
-function gui.home(snaps)
+function gui.home(snaps, modal)
     local layer = GUI.createLayer({
         name = 'home'
     })
 
     local list = {}
 
-    for name, _ in pairs(snaps) do
-        table.insert(list, name)
+    for _, snap in ipairs(snaps) do
+        if snap and snap.name then
+            table.insert(list, snap.name)
+        end
     end
 
     local listbox = GUI.createElement({
@@ -65,30 +106,46 @@ function gui.home(snaps)
         x = 3,
         y = 3,
         w = 333,
-        h = 596,
+        h = 550,
         pad = 3,
         multi = true,
         list = list
     })
 
+    local button = GUI.createElement({
+        name = 'take snap',
+        type = 'button',
+        x = 50,
+        y = 560,
+        caption = 'Take Snapshot'
+    })
 
+    button.func = function()
+        gui.swap_layers(layer, modal)
+    end
+    
+    layer:addElements(button)
     layer:addElements(listbox)
     return layer
 
 end
 
-
-
 function gui.start(snaps)
     local window = gui.init_window()
     -- local layer = gui.no_greap()
-    local layer = gui.home(snaps)
 
-    window:addLayers(layer)
+    -- All layers need to be created at startup
+    local modal = gui.snapshot_modal()
+    local home = gui.home(snaps, modal)
+
+    modal:hide()
+
+    window:addLayers(home)
+    window:addLayers(modal)
 
     window:open()
     GUI.Main()
-
 end
+
 
 return gui

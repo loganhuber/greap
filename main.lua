@@ -84,9 +84,9 @@ function main()
     -- local snap = snapshot.read('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap/0001.json')
     -- reaper.ShowConsoleMsg(json.encode(snap))
 
-    -- local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
-    -- -- reaper.ShowConsoleMsg(json.encode(snaps))
-    -- gui.start(snaps)
+    local snaps = snapshot.read_all('/Users/logan/Documents/reaper_projects/projects/leg_day_vocal_demo/Media/.greap')
+    -- reaper.ShowConsoleMsg(json.encode(snaps))
+    gui.start(snaps)
     
 end
 
